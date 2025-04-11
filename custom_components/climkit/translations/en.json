@@ -1,0 +1,19 @@
+{
+  "title": "Climkit",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Climkit",
+        "description": "Enter your Climkit credentials.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "auth_failed": "Authentication failed. Please check your credentials.",
+      "no_sites": "No sites found for this account."
+    }
+  }
+}

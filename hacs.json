@@ -1,0 +1,8 @@
+{
+  "name": "Climkit Energy & Water Sensors",
+  "content_in_root": false,
+  "domains": ["climkit"],
+  "country": ["CH"],
+  "homeassistant": "2025.3.0",
+  "render_readme": true
+}
