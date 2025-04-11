@@ -14,6 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"
+CONF_APIKEY = "api_key"
 
 CONFIG_SCHEMA = vol.Schema(
   {
@@ -21,6 +22,7 @@ CONFIG_SCHEMA = vol.Schema(
       {
         vol.Required(CONF_USERNAME): cv.string,
         vol.Required(CONF_PASSWORD): cv.string,
+        vol.Required(CONF_APIKEY): cv.string,
       }
     )
   },
@@ -33,8 +35,9 @@ async def async_setup(hass, config):
   conf = config[DOMAIN]
   username = conf[CONF_USERNAME]
   password = conf[CONF_PASSWORD]
+  api_key = conf[CONF_APIKEY]
 
-  api = ClimkitAPI(username, password)
+  api = ClimkitAPI(username, password, api_key)
   await api.authenticate()
 
   site_id = await api.get_site_id()
@@ -82,8 +85,10 @@ async def async_setup_entry(hass, config_entry):
     conf = config_entry.data
     username = conf["username"]
     password = conf["password"]
+    api_key = conf["api_key"]
+    
 
-    api = ClimkitAPI(username, password)
+    api = ClimkitAPI(username, password, api_key)
     await api.authenticate()
 
     sites = await api.get_site_id()

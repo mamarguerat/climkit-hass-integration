@@ -3,6 +3,6 @@
   "content_in_root": false,
   "domains": ["climkit"],
   "country": ["CH"],
-  "homeassistant": "2025.3.0",
+  "homeassistant": "2025.4.0",
   "render_readme": true
 }
