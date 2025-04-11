@@ -17,10 +17,11 @@ class ClimkitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             username = user_input["username"]
             password = user_input["password"]
+            api_key = user_input["api_key"]
 
             # Validate credentials
             session = aiohttp_client.async_get_clientsession(self.hass)
-            api = ClimkitAPI(username, password)
+            api = ClimkitAPI(username, password, api_key)
             try:
                 await api.authenticate()
                 sites = await api.get_site_id()
@@ -37,6 +38,7 @@ class ClimkitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 vol.Required("username"): str,
                 vol.Required("password"): str,
+                vol.Required("api_key"): str,
             }
         )
 

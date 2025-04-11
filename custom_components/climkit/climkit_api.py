@@ -1,42 +1,100 @@
 import aiohttp
+import logging
 
-API_BASE = "https://api.climkit.io/api/v1"
+_LOGGER = logging.getLogger(__name__)
 
 class ClimkitAPI:
-  def __init__(self, username, password):
-    self.username = username
-    self.password = password
-    self.token = None
-    self.session = aiohttp.ClientSession()
+    """Class to interact with the Climkit API."""
 
-  async def authenticate(self):
-    url = f"{API_BASE}/auth"
-    payload = {"username": self.username, "password": self.password}
-    async with self.session.post(url, json=payload) as resp:
-      resp.raise_for_status()
-      data = await resp.json()
-      self.token = data.get("token")
+    BASE_URL = "https://api.climkit.com/v1"
 
-  async def _get(self, endpoint):
-    headers = {
-      "Authorization": f"Bearer {self.token}",
-      "Content-Type": "application/json"
-    }
-    async with self.session.get(f"{API_BASE}{endpoint}", headers=headers) as resp:
-      resp.raise_for_status()
-      return await resp.json()
+    def __init__(self, username, password, api_key):
+        """Initialize the API client."""
+        self.username = username
+        self.password = password
+        self.api_key = api_key
+        self.session = None
 
-  async def get_site_id(self):
-    data = await self._get("/all_installations")
-    if data and isinstance(data, list):
-      return data[0].get("site_id")
-    return None
+    async def authenticate(self):
+        """Authenticate with the Climkit API."""
+        if not self.session:
+            self.session = aiohttp.ClientSession()
 
-  async def get_meter_list(self, site_id):
-    return await self._get(f"/meter_info/{site_id}")
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
 
-  async def get_meter_data(self, site_id, meter_id):
-    return await self._get(f"/meter_data/{site_id}/{meter_id}")
+        try:
+            async with self.session.get(f"{self.BASE_URL}/auth", headers=headers) as response:
+                if response.status == 200:
+                    _LOGGER.debug("Authentication successful.")
+                    return True
+                else:
+                    _LOGGER.error("Authentication failed: %s", response.status)
+                    raise Exception("Authentication failed")
+        except aiohttp.ClientError as e:
+            _LOGGER.error("Error during authentication: %s", e)
+            raise
 
-  async def close(self):
-    await self.session.close()
+    async def get_site_id(self):
+        """Retrieve the list of sites associated with the account."""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            async with self.session.get(f"{self.BASE_URL}/sites", headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get("sites", [])
+                else:
+                    _LOGGER.error("Failed to fetch sites: %s", response.status)
+                    return []
+        except aiohttp.ClientError as e:
+            _LOGGER.error("Error fetching sites: %s", e)
+            return []
+
+    async def get_meter_list(self, site_id):
+        """Retrieve the list of meters for a specific site."""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            async with self.session.get(f"{self.BASE_URL}/sites/{site_id}/meters", headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get("meters", [])
+                else:
+                    _LOGGER.error("Failed to fetch meters: %s", response.status)
+                    return []
+        except aiohttp.ClientError as e:
+            _LOGGER.error("Error fetching meters: %s", e)
+            return []
+
+    async def get_meter_data(self, site_id, meter_id):
+        """Retrieve data for a specific meter."""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            async with self.session.get(f"{self.BASE_URL}/sites/{site_id}/meters/{meter_id}/data", headers=headers) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    _LOGGER.error("Failed to fetch meter data: %s", response.status)
+                    return {}
+        except aiohttp.ClientError as e:
+            _LOGGER.error("Error fetching meter data: %s", e)
+            return {}
+
+    async def close(self):
+        """Close the session."""
+        if self.session:
+            await self.session.close()
+            self.session = None
