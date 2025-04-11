@@ -1,0 +1,10 @@
+{
+  "domain": "climkit",
+  "name": "Climkit Energy & Water Sensors",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/mamarguerat/climkit-hass-integration",
+  "requirements": ["aiohttp"],
+  "dependencies": [],
+  "codeowners": ["@mamarguerat"]
+}
