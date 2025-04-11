@@ -1,0 +1,19 @@
+{
+  "title": "Climkit",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Paramétrer Climkit",
+        "description": "Entrez vos identifiants Climkit.",
+        "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe"
+        }
+      }
+    },
+    "error": {
+      "auth_failed": "Échec de l'authentification. Veuillez vérifier vos identifiants.",
+      "no_sites": "Aucun site trouvé pour ce compte."
+    }
+  }
+}
